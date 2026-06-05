@@ -1,0 +1,37 @@
+{
+  "manifest_version": 3,
+  "name": "Keka Auto-Login with Google",
+  "version": "1.0.0",
+  "description": "Automatically logs into Keka using existing Google session.",
+  "permissions": [
+    "storage",
+    "tabs"
+  ],
+  "host_permissions": [
+    "*://*.keka.com/*",
+    "https://accounts.google.com/*"
+  ],
+  "background": {
+    "service_worker": "scripts/background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.keka.com/*",
+        "https://accounts.google.com/gsi/button*"
+      ],
+      "js": ["scripts/keka-content.js"],
+      "run_at": "document_idle",
+      "all_frames": true
+    },
+    {
+      "matches": ["https://accounts.google.com/*"],
+      "js": ["scripts/google-content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "options/options.html"
+  },
+  "options_page": "options/options.html"
+}
