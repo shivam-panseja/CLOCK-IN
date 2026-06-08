@@ -30,15 +30,25 @@
       return document.querySelector('[role="button"], #continue-as, .nsm7Bb-HzV7m-LgbsSe, [id*="google"]');
     }
 
-    // 2. Known Keka specific selectors
-    const specificBtn = document.querySelector('.btn-google-login, .g_id_signin, [href*="google"], [id*="google-login"]');
+    // 2. Known Keka specific selectors (Highest Priority)
+    const specificBtn = document.querySelector('.btn-google-login, .g_id_signin, [href*="google-login"], [id*="google-login"]');
     if (specificBtn) return specificBtn;
 
-    // 3. Fallback: search for "Google" text in clickables
-    const allClickables = Array.from(document.querySelectorAll('button, a, div[role="button"]'));
+    // 3. Fallback: search for "Google" text in clickables, but be smarter
+    const allClickables = Array.from(document.querySelectorAll('button, a, div[role="button"], span[role="button"]'));
+    
+    // First pass: Look for "Google" + "Login/Sign in"
+    const loginMatch = allClickables.find(el => {
+        const text = (el.textContent || '').toLowerCase();
+        return text.includes('google') && (text.includes('login') || text.includes('sign') || text.includes('connect'));
+    });
+    if (loginMatch) return loginMatch;
+
+    // Second pass: Look for "Google" but exclude "Play Store", "App Store", etc.
     return allClickables.find(el => {
         const text = (el.textContent || '').toLowerCase();
-        return text.includes('google') && !text.includes('signed in');
+        const isPlayStore = text.includes('play') || text.includes('store') || text.includes('android') || text.includes('ios');
+        return text.includes('google') && !text.includes('signed in') && !isPlayStore;
     });
   };
 
